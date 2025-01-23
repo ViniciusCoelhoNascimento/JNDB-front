@@ -1,0 +1,12 @@
+.center-section {
+    display: flex;
+    flex-direction: column; /* Mantém os cards em uma coluna */
+    align-items: center;    /* Centraliza horizontalmente */
+    gap: 1rem;              /* Espaçamento entre os cards */
+    padding: 1rem;          /* Espaçamento interno para evitar encostar nas bordas */
+}
+
+app-results {
+    width: 100%;           /* Faz com que os cards se ajustem ao tamanho do container */
+    max-width: 500px;      /* Define a largura máxima para os cards */
+}
