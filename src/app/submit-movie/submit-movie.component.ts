@@ -113,7 +113,7 @@ export class SubmitMovieComponent {
       //documentation: https://www.omdbapi.com/
       const title = this.applyForm.value.title?.toString() ?? '';
   
-      const url = 'http://www.omdbapi.com/?t=' + this.applyForm.value.title + '&apikey=82f4bfd1';
+      const url = 'http://localhost:8080/api/proxy/OMDb/' + this.applyForm.value.title
       const response = await fetch(url);
       const data = await response.json();
 

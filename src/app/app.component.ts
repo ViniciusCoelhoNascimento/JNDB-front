@@ -32,7 +32,10 @@ import { RouterModule } from '@angular/router';
               <li><a [routerLink]="['/submit-movie']" class="dropdown-item">Enviar filme</a></li>
               <li><a class="dropdown-item">Sair</a></li>
             </ul>
-          </div>          
+          </div> 
+          <div>
+            
+          </div>         
       </nav>
     </header>
     <section>
@@ -44,8 +47,16 @@ import { RouterModule } from '@angular/router';
 })
 export class AppComponent {
   title = 'JNDB-front';
-
+  isLogged = false;
   isExpanded = false;
+
+  constructor(){
+
+  }
+
+  funcIsLogged(){
+
+  }
 
   toggleDropDown() {
     this.isExpanded = !this.isExpanded;
