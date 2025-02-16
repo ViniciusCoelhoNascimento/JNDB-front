@@ -5,6 +5,7 @@ import { SubmitBookComponent } from './submit-book/submit-book.component';
 import { DetailsComponent } from './details/details.component';
 import { SubmitMovieComponent } from './submit-movie/submit-movie.component';
 import { MoviesSearchComponent } from './movies-search/movies-search.component';
+import { DetailsMovieComponent } from './details-movie/details-movie.component';
 
 export const routes: Routes = [
     {
@@ -30,6 +31,11 @@ export const routes: Routes = [
     {
         path: 'details/:id',
         component: DetailsComponent,
+        title: 'Detalhes'
+    },
+    {
+        path: 'details-movie/:id',
+        component: DetailsMovieComponent,
         title: 'Detalhes'
     },
     {

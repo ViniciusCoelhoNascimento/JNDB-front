@@ -20,7 +20,7 @@ import { RouterModule } from '@angular/router';
           
           <!-- Botão com Submenus -->
           <div class="dropdown">
-            <a [routerLink]="['/user-register']"  class="btn btn-warning">Contribuir</a>
+            <a [routerLink]="['/user-register']"  class="btn btn-warning">Logar</a>
             <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" [attr.aria-expanded]="isExpanded ? 'true' : 'false'" 
             (click)="toggleDropDown()">
               Menu

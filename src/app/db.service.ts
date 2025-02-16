@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Book } from './book';
+import { Movie } from './movie';
 import { Video } from './video';
 
 @Injectable({
@@ -25,6 +26,23 @@ export class DbService {
   async getAllBooks() : Promise<Book[]> {
     const data = await fetch(this.url + 'api/books');
     return await data.json() ?? [];
+  }
+
+  async getBookById(idBook : number) : Promise<Book> {
+    const data = await fetch(this.url + 'api/book/'+idBook);
+    const json = await data.json();
+    return json ?? [];
+  }
+
+  async getAllMovies() : Promise<Movie[]> {
+    const data = await fetch(this.url + 'api/movies/movies');
+    return await data.json() ?? [];
+  }
+
+  async getMovieById(idMovie : number) : Promise<Movie> {
+    const data = await fetch(this.url + 'api/movies/movieById/'+idMovie);
+    const json = await data.json();
+    return json ?? [];
   }
 
   async getRelatedVideos(videoId: number) : Promise<Video[]> {

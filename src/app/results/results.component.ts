@@ -12,14 +12,18 @@ import { RouterModule } from '@angular/router';
       <div class="row mt-4" id="searchResults">
               <!-- Card de Exemplo 1 -->
               <div class="col-md-100">
-                  <div class="card">
+                  <div class="card" style="display: flex; flex-direction: row;">
                       <div class="card-body">
                           <h5 class="card-title">{{book.title}}</h5>
                           <p class="card-text">{{book.author}}</p>
                           <p class="card-text">{{book.isbn13}}</p>
                           <a [routerLink]="['/details', book.id]">Ver mais</a>
+                          </div>
+                      <div>
+                        <img [src]="book.imgURL" height="150px">
                       </div>
                   </div>
+                  
               </div>
       </div>
     </section>

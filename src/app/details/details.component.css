@@ -22,6 +22,7 @@
     align-items: flex-start;
     position: relative;
     margin: 0 16px; /* Espaço de "um dedo" nas laterais */
+    margin-bottom: 16px;
     box-sizing: border-box; /* Inclui padding/border no cálculo do tamanho */
   }
   
@@ -54,6 +55,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    height: 50px;
   }
   
   .save-button .icon {
@@ -74,5 +76,50 @@
     height: 100%;
     object-fit: cover;
   }
+  
+  .favorited {
+    display: none;
+  }
+
+.comment-box {
+  width: 100%;
+  max-width: 500px;
+  margin: 10px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  resize: none;
+}
+
+.comment-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
   
   

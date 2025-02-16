@@ -38,14 +38,12 @@ import { DbService } from '../db.service';
         
           <div>
             <label for="title">Titulo do filme:</label>
-            <input for="title" type="text" formControlName="title"><button type="button" (click)="getMovieOMDbAPI()">Procurar</button>
+            <input for="title" type="text" formControlName="title"><button type="button" (click)="getMovieTMDbAPI()">Procurar</button>
           </div>
 
-          <img [src]="posterURL">
+          <img height="300px" [src]="posterURL">
           <p>Titulo: {{ title }}</p>
           <p>Ano: {{ year }}</p>
-          <p>Gênero: {{ genre }}</p>
-          <p>Diretor: {{ director }}</p>
           <p>Plot: {{ plot }}</p>
 
           <button type="submit" class="primary">Enviar contribuição</button>
@@ -61,9 +59,7 @@ export class SubmitMovieComponent {
     applyForm = new FormGroup({
       title: new FormControl(''),
       description: new FormControl(''),
-      genre: new FormControl(''),
       year: new FormControl(''),
-      director: new FormControl(''),
       videoSelected: new FormControl(''),
     });
   
@@ -74,9 +70,7 @@ export class SubmitMovieComponent {
     title: string = '';
     plot: string = '';
     posterURL: string = '';
-    genre: string = '';
-    director: string = '';
-    year: number = 0;
+    year: string = '';
   
     constructor(){
      this.getNerdOfficeVideos();
@@ -92,37 +86,39 @@ export class SubmitMovieComponent {
         title: this.title,
         year: this.year,
         plot: this.plot,
-        director: this.director,
-        genre: this.genre,
         linkPoster: this.posterURL
       };
 
       //cadastro filme
-      const movieID = await this.dbService.makeAuthenticatedPOST('/logged/movies/movies', movieBody)
+      const movieID = await this.dbService.makeAuthenticatedPOST('logged/movies/movies', movieBody)
       //cadastro relação
       const relationBody = {
         movieId: movieID,
         videoId: videoId
       }
-      await this.dbService.makeAuthenticatedPOST('/logged/movies/movies/videos', relationBody)
+      await this.dbService.makeAuthenticatedPOST('logged/movies/movies/videos', relationBody)
   
     }
   
-    async getMovieOMDbAPI(){
-      //colocar a api key. Colocar em uma variavel do ambiente
-      //documentation: https://www.omdbapi.com/
+    async getMovieTMDbAPI(){
       const title = this.applyForm.value.title?.toString() ?? '';
-  
-      const url = 'http://localhost:8080/api/proxy/OMDb/' + this.applyForm.value.title
-      const response = await fetch(url);
+      const url = 'http://localhost:8080/api/proxy/TMDB/' + encodeURIComponent(title)
+      const token = localStorage.getItem('jndb-token');
+      const response = await fetch(url,{
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      });
       const data = await response.json();
+      console.log(data)
 
-      this.title = data.Title
-      this.year = data.Year
-      this.plot = data.Plot
-      this.director = data.Director
-      this.genre = data.Genre
-      this.posterURL = data.Poster
+      this.title = data.results[0].original_title
+      this.year = data.results[0].release_date
+      this.plot = data.results[0].overview
+      //this.director = data.Director
+      //this.genre = data.results[0].Genre
+      this.posterURL = "https://image.tmdb.org/t/p/w500/" + data.results[0].poster_path
     
 //colocar o codigo para pegar as informações do filme
     }
@@ -130,9 +126,10 @@ export class SubmitMovieComponent {
     async onInputChange() {
   
       if (this.query) {
-        this.suggestions = this.allSuggestions.filter(item =>
-          item.includes(this.query.toLowerCase())
-        );      
+        this.suggestions = this.allSuggestions.filter(item => {
+          const words = this.query.toLowerCase().split(/\s+/); // Divide a query em palavras
+          return words.every(word => item.toLowerCase().includes(word));
+        });        
       } else {
         this.suggestions = [];
       }
@@ -150,16 +147,20 @@ export class SubmitMovieComponent {
         this.dicionario.set(item.id, item.title);
         this.allSuggestions.push(item.title);
       });
+
+      console.log(this.allSuggestions)
     }
   
     // Função para buscar a chave pelo valor
     getKeyByValue(map: Map<number, string>, value: string): number | undefined {
+      value = value.toLowerCase(); // Normaliza a entrada do usuário para evitar problemas com maiúsculas/minúsculas
+    
       for (const [key, val] of map.entries()) {
-        if (val === value) {
-          return key; // Retorna a chave correspondente
+        if (val.toLowerCase().includes(value)) { // Verifica se a string contém o valor buscado
+          return key; // Retorna a primeira chave correspondente
         }
       }
-      return undefined; // Retorna undefined se o valor não for encontrado
-    }
+      return undefined; // Retorna undefined se nenhum valor corresponder
+    }    
 
 }

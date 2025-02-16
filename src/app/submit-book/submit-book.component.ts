@@ -85,6 +85,7 @@ export class SubmitBookComponent {
     const bookBody = {
       title: this.title,
       author: this.author,
+      imgURL: this.imgURL,
       isbn_13: isbn13
     };
     //cadastro livro
