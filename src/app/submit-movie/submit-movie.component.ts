@@ -90,10 +90,11 @@ export class SubmitMovieComponent {
       };
 
       //cadastro filme
-      const movieID = await this.dbService.makeAuthenticatedPOST('logged/movies/movies', movieBody)
+      const filmeId = await this.dbService.makeAuthenticatedPOST('logged/movies/movies', movieBody)
+      console.log('filme id: ' + filmeId)
       //cadastro relação
       const relationBody = {
-        movieId: movieID,
+        filmeId: filmeId,
         videoId: videoId
       }
       await this.dbService.makeAuthenticatedPOST('logged/movies/movies/videos', relationBody)

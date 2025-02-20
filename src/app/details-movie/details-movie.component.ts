@@ -73,9 +73,11 @@ export class DetailsMovieComponent {
 
   constructor(){
     const itemId = Number(this.route.snapshot.params['id'])
-    this.dbService.getRelatedVideos(itemId).then((lVideoList: Video[]) => {
+    this.dbService.getMoviesRelatedVideos(itemId).then((lVideoList: Video[]) => {
       this.videoList = lVideoList;
     });
+
+    console.log(this.videoList)
 
     this.dbService.getMovieById(itemId).then((lMovie: Movie) => {
       this.Movie = lMovie;

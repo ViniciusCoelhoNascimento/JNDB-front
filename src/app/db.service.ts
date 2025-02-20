@@ -45,8 +45,16 @@ export class DbService {
     return json ?? [];
   }
 
-  async getRelatedVideos(videoId: number) : Promise<Video[]> {
-    const data = await fetch(this.url + 'api/books/' + videoId + '/videos');
+  async getRelatedVideos(bookId: number) : Promise<Video[]> {
+    const data = await fetch(this.url + 'api/books/' + bookId + '/videos');
+    const json = await data.json() ?? [];
+    console.log(json)
+    //return json as Video[];
+    return json;
+  }
+
+  async getMoviesRelatedVideos(movieId: number) : Promise<Video[]> {
+    const data = await fetch(this.url + 'api/movies/' + movieId + '/videos');
     const json = await data.json() ?? [];
     console.log(json)
     //return json as Video[];

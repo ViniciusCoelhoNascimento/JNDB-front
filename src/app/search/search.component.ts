@@ -12,11 +12,11 @@ import { CommonModule } from '@angular/common';
     <div class="container">
         <!-- Barra de Busca -->
         <div class="search-bar">
-            <input type="text" id="searchInput" class="form-control" placeholder="Digite o titulo de um livro..." onkeyup="filterCards()">
-        </div>
+            <input type="text" id="searchInput" class="form-control" placeholder="Digite o titulo de um livro..." (input)="filterCards($event)">
+          </div>
     </div>
   </section>
-    <section>
+    <section class="results">
       <app-results *ngFor="let bookVariable of filteredBooksList" [book] = "bookVariable" ></app-results>
     </section>
   `,
@@ -32,5 +32,14 @@ export class SearchComponent {
       this.booksList = lbooksList;
       this.filteredBooksList = lbooksList;
     });
+  }
+
+  filterCards(event: Event) {
+    const text: string = (event.target as HTMLInputElement).value
+    if (!text) this.filteredBooksList = this.booksList;
+
+    this.filteredBooksList = this.booksList.filter(
+      book => book?.title.toLowerCase().includes(text.toLowerCase())
+    );
   }
 }

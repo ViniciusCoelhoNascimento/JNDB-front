@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
     <div class="container">
         <!-- Barra de Busca -->
         <div class="search-bar">
-            <input type="text" id="searchInput" class="form-control" placeholder="Digite o titulo de um filme..." onkeyup="filterCards()">
+            <input type="text" id="searchInput" class="form-control" placeholder="Digite o titulo de um filme..." (input)="filterCards($event)">
         </div>
     </div>
   </section>
@@ -34,4 +34,15 @@ export class MoviesSearchComponent {
       this.filteredMoviesList = lmoviesList;
     });
   }
+
+  filterCards(event: Event) {
+    console.log('chamou')
+    const text: string = (event.target as HTMLInputElement).value
+    if (!text) this.filteredMoviesList = this.moviesList;
+
+    this.filteredMoviesList = this.moviesList.filter(
+      movie => movie?.title.toLowerCase().includes(text.toLowerCase())
+    );
+  }
+  
 }

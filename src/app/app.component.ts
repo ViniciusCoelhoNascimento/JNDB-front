@@ -12,15 +12,19 @@ import { RouterModule } from '@angular/router';
 
     <header>
       <nav class="header d-flex justify-content-between align-items-center">
-          <div>
+          <div style="margin-left: 2%;">
               <a [routerLink]="['']" class="btn btn-outline-primary me-2">Livros</a>
               <a [routerLink]="['movies-search']" class="btn btn-outline-success me-2">Filmes</a>
               <!--<a [routerLink]="['']" class="btn btn-outline-success">Nerdologia</a>-->
           </div>
+
+            <p class="titulo" >JNDB</p>
+          
           
           <!-- Botão com Submenus -->
-          <div class="dropdown">
-            <a [routerLink]="['/user-register']"  class="btn btn-warning">Logar</a>
+           <div style="display: flex; gap: 5px; margin-right: 2%;">
+              <a [routerLink]="['/user-register']"  class="btn btn-warning">Logar</a>
+              <div class="dropdown">
             <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" [attr.aria-expanded]="isExpanded ? 'true' : 'false'" 
             (click)="toggleDropDown()">
               Menu
@@ -33,12 +37,11 @@ import { RouterModule } from '@angular/router';
               <li><a class="dropdown-item">Sair</a></li>
             </ul>
           </div> 
-          <div>
-            
-          </div>         
+            </div>
+        
       </nav>
     </header>
-    <section>
+    <section style="display: flex; justify-content: center;">
       <router-outlet></router-outlet>
     </section>
   </main>
@@ -50,11 +53,11 @@ export class AppComponent {
   isLogged = false;
   isExpanded = false;
 
-  constructor(){
+  constructor() {
 
   }
 
-  funcIsLogged(){
+  funcIsLogged() {
 
   }
 
@@ -62,8 +65,8 @@ export class AppComponent {
     this.isExpanded = !this.isExpanded;
   }
 
-   // Fecha o dropdown
-   closeDropdown(): void {
+  // Fecha o dropdown
+  closeDropdown(): void {
     this.isExpanded = false;
   }
 
@@ -72,7 +75,7 @@ export class AppComponent {
   onClickOutside(event: Event): void {
     const target = event.target as HTMLElement;
     const isDropdownElement = target.closest('.dropdown') || target.closest('.dropdown-button');
-    const isDropDownItemClicked = target.closest('.dropdown-item') 
+    const isDropDownItemClicked = target.closest('.dropdown-item')
     if (!isDropdownElement || isDropDownItemClicked) {
       this.closeDropdown();
     }
