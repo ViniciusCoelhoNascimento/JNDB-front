@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { GoogleAuthService } from './services/google-auth.service';
+
 
 @Component({
   selector: 'app-root',
@@ -16,6 +18,7 @@ import { RouterModule } from '@angular/router';
               <a [routerLink]="['']" class="btn btn-outline-primary me-2">Livros</a>
               <a [routerLink]="['movies-search']" class="btn btn-outline-success me-2">Filmes</a>
               <!--<a [routerLink]="['']" class="btn btn-outline-success">Nerdologia</a>-->
+              
           </div>
 
             <p class="titulo" >JNDB</p>
@@ -23,7 +26,8 @@ import { RouterModule } from '@angular/router';
           
           <!-- Botão com Submenus -->
            <div style="display: flex; gap: 5px; margin-right: 2%;">
-              <a [routerLink]="['/user-register']"  class="btn btn-warning">Logar</a>
+           <a [routerLink]="['/user-register']"  class="btn btn-warning">Logar</a>
+           <a href="http://localhost:8080/auth/login"  class="btn btn-warning">Logar com Google</a>
               <div class="dropdown">
             <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" [attr.aria-expanded]="isExpanded ? 'true' : 'false'" 
             (click)="toggleDropDown()">
@@ -53,9 +57,12 @@ export class AppComponent {
   isLogged = false;
   isExpanded = false;
 
+
   constructor() {
 
   }
+
+
 
   funcIsLogged() {
 
