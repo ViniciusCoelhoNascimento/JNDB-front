@@ -5,10 +5,11 @@ import { Book } from '../book';
 import { DbService } from '../db.service';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { CommentsSessionComponent } from '../comments-session/comments-session.component';
 
 @Component({
   selector: 'app-details',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CommentsSessionComponent],
   template: `
   <article>
           <div class="container">
@@ -31,29 +32,7 @@ import { FormsModule } from '@angular/forms';
         </div>
 </div>
 
-<div class="container">
-  <div class="content">
-  <h2>Comentários</h2>
-  <div class="comment-box">
-    <textarea
-      [(ngModel)]="comment" 
-      placeholder="Escreva seu comentário..."
-      rows="4"
-      maxlength="200">
-    </textarea>
-    <div class="comment-footer">
-      <span>{{ comment.length }}/250</span>
-      <button (click)="postComment()" [disabled]="!comment.trim()">Enviar</button>
-    </div>
-  </div>
-
-  <textarea readonly *ngFor="let comentario of comments" >
-    {{comentario}}
-  </textarea>
-
-  </div>
-</div>
-
+<app-comments-session></app-comments-session>
 
   </article>
   `,
@@ -67,8 +46,6 @@ export class DetailsComponent {
   imageSavedBook = 'assets/savedBook.png'
   isFavorited = false;
   book?: Book;
-  comment: string = '';
-  comments: string[] = ['comentario1','comentario2'];
 
   constructor(){
     const itemId = Number(this.route.snapshot.params['id'])
@@ -89,12 +66,4 @@ export class DetailsComponent {
   unfavorite(){
     this.isFavorited = false;
   }
-
-  postComment() {
-    if (this.comment.trim()) {
-      console.log('Comentário enviado:', this.comment);
-      this.comment = '';
-    }
-  }
-
 }
