@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { DbService } from './db.service';
+import { inject } from '@angular/core';
+import { User } from './user';
 
 @Component({
   selector: 'app-root',
@@ -23,14 +26,15 @@ import { RouterModule } from '@angular/router';
           
           <!-- Botão com Submenus -->
            <div style="display: flex; gap: 5px; margin-right: 2%;">
-              <a [routerLink]="['/user-register']"  class="btn btn-warning">Logar</a>
+              <!--<a [routerLink]="['/user-register']"  class="btn btn-warning">Logar</a>-->
+              <p>{{username}}</p>
               <div class="dropdown">
             <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" [attr.aria-expanded]="isExpanded ? 'true' : 'false'" 
             (click)="toggleDropDown()">
               Menu
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" [class.show]="isExpanded">
-              <li><a class="dropdown-item">Notificações</a></li>
+              <!--<li><a class="dropdown-item">Notificações</a></li>-->
               <li><a class="dropdown-item">Salvos</a></li>
               <li><a [routerLink]="['/submit-book']" class="dropdown-item">Enviar livro</a></li>
               <li><a [routerLink]="['/submit-movie']" class="dropdown-item">Enviar filme</a></li>
@@ -50,14 +54,22 @@ import { RouterModule } from '@angular/router';
 })
 export class AppComponent {
   title = 'JNDB-front';
-  isLogged = false;
   isExpanded = false;
+  username = '';
+  dbService: DbService = inject(DbService);
 
   constructor() {
+    this.loadUser();
 
   }
 
-  funcIsLogged() {
+  async loadUser() {
+    if (!localStorage.getItem('jndb-token')) {
+      const user: User = await this.dbService.getUser();
+      this.username = user.username;
+    } else {
+      this.username = localStorage.getItem('username') ?? '';
+    }
 
   }
 
