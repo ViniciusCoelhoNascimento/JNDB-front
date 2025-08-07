@@ -33,14 +33,15 @@ import { CommentsSessionComponent } from '../comments-session/comments-session.c
         </div>
 </div>
 
-<app-comments-session></app-comments-session>
+<app-comments-session [itemType]="'details-movie'" [itemId]="itemId"></app-comments-session>
 
   </article>
   `,
   styleUrl: './details-movie.component.css'
 })
 export class DetailsMovieComponent {
- route: ActivatedRoute = inject(ActivatedRoute)
+  route: ActivatedRoute = inject(ActivatedRoute)
+  itemId: number = Number(this.route.snapshot.params['id'])
   videoList: Video[] = [];
   dbService: DbService = inject(DbService)
   imageSaveMovie = 'assets/saveBook.png'
@@ -49,14 +50,13 @@ export class DetailsMovieComponent {
   Movie?: Movie;
 
   constructor(){
-    const itemId = Number(this.route.snapshot.params['id'])
-    this.dbService.getMoviesRelatedVideos(itemId).then((lVideoList: Video[]) => {
+    this.dbService.getMoviesRelatedVideos(this.itemId).then((lVideoList: Video[]) => {
       this.videoList = lVideoList;
     });
 
     console.log(this.videoList)
 
-    this.dbService.getMovieById(itemId).then((lMovie: Movie) => {
+    this.dbService.getMovieById(this.itemId).then((lMovie: Movie) => {
       this.Movie = lMovie;
     });
   }

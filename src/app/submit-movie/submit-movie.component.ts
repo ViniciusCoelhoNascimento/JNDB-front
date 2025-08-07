@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DbService } from '../db.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-submit-movie',
@@ -38,15 +39,19 @@ import { DbService } from '../db.service';
         
           <div>
             <label for="title">Titulo do filme:</label>
-            <input for="title" type="text" formControlName="title"><button type="button" (click)="getMovieTMDbAPI()">Procurar</button>
+            <div style="display:flex; gap: 5px; align-items: center;">
+              <input for="title" type="text" formControlName="title"><button type="button" (click)="getMovieTMDbAPI()">Procurar</button>
+              <img class="invisible" src="assets/loading.gif" height="16px" width="16px" [ngClass]="{'invisible': !loadingBln}">
+            </div>
           </div>
 
-          <img height="300px" [src]="posterURL">
-          <p>Titulo: {{ title }}</p>
-          <p>Ano: {{ year }}</p>
-          <p>Plot: {{ plot }}</p>
-
-          <button type="submit" class="primary">Enviar contribuição</button>
+          <div style="display: flex; width: 700px; flex-direction: column;">
+            <img height="300px" width="auto" [src]="posterURL">
+            <p><strong>Titulo:</strong> {{ title }}</p>
+            <p><strong>Ano:</strong> {{ year }}</p>
+            <p><strong>Plot:</strong> {{ plot }}</p>
+          </div>
+          <button type="submit" class="primary">Enviar</button>
         </form>
       </section>
   `,
@@ -55,6 +60,7 @@ import { DbService } from '../db.service';
 export class SubmitMovieComponent {
   
     dbService: DbService = inject(DbService);
+    loadingBln = false;
   
     applyForm = new FormGroup({
       title: new FormControl(''),
@@ -72,15 +78,21 @@ export class SubmitMovieComponent {
     posterURL: string = '';
     year: string = '';
   
-    constructor(){
+    constructor(private toastr: ToastrService){
      this.getNerdOfficeVideos();
     }
   
     async submitMovie(){
+
+      if (!this.applyForm.valid) {
+        this.toastr.error('Erro','Favor completar as informações')
+      }
+
       //primeiro cadastra o filme e depois cadastra a relação
       const videoId = this.getKeyByValue(this.dicionario, this.applyForm.value.videoSelected ?? '')
       const title = this.applyForm.value.title;
       const description = this.applyForm.value.description;
+      const info = null;
   
       const movieBody = {
         title: this.title,
@@ -89,39 +101,60 @@ export class SubmitMovieComponent {
         linkPoster: this.posterURL
       };
 
-      //cadastro filme
-      const filmeId = await this.dbService.makeAuthenticatedPOST('logged/movies/movies', movieBody)
-      console.log('filme id: ' + filmeId)
-      //cadastro relação
-      const relationBody = {
-        filmeId: filmeId,
-        videoId: videoId
+      try{
+        //cadastro filme
+        const filmeId = await this.dbService.makeAuthenticatedPOST('logged/movies/movies', movieBody)
+        console.log('filme id: ' + filmeId)
+        //cadastro relação
+        const relationBody = {
+          filmeId: filmeId,
+          videoId: videoId
+        }
+        await this.dbService.makeAuthenticatedPOST('logged/movies/movies/videos', relationBody)
+      } catch(error){
+        this.toastr.error('Mensagem', 'Erro ao enviar.')
+      } finally {
+        this.toastr.success('Mensagem', 'Enviado com sucesso!')
       }
-      await this.dbService.makeAuthenticatedPOST('logged/movies/movies/videos', relationBody)
-  
+
     }
   
     async getMovieTMDbAPI(){
+      this.loadingBln = true;
       const title = this.applyForm.value.title?.toString() ?? '';
       const url = 'http://localhost:8080/api/proxy/TMDB/' + encodeURIComponent(title)
       const token = localStorage.getItem('jndb-token');
-      const response = await fetch(url,{
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-      });
-      const data = await response.json();
-      console.log(data)
 
-      this.title = data.results[0].original_title
-      this.year = data.results[0].release_date
-      this.plot = data.results[0].overview
-      //this.director = data.Director
-      //this.genre = data.results[0].Genre
-      this.posterURL = "https://image.tmdb.org/t/p/w500/" + data.results[0].poster_path
-    
-//colocar o codigo para pegar as informações do filme
+      try{
+        const response = await fetch(url,{
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        })
+        const data = await response.json()
+        console.log(data)
+  
+        this.title = data.results[0].original_title
+        this.year = data.results[0].release_date
+        this.plot = data.results[0].overview
+        //this.director = data.Director
+        //this.genre = data.results[0].Genre
+        this.posterURL = "https://image.tmdb.org/t/p/w500/" + data.results[0].poster_path
+
+      } catch (error){
+        console.log('Erro ao buscar os dados: ', error)
+        this.toastr.info('','Filme não encontrado!')
+      } finally {
+        this.loadingBln = false;
+
+        this.toastr.success("Enviado com sucesso!",'Feito!')
+        this.applyForm.patchValue({
+          title: '',
+          description: '',
+          year: ''
+        })
+      }
     }
   
     async onInputChange() {
@@ -163,5 +196,4 @@ export class SubmitMovieComponent {
       }
       return undefined; // Retorna undefined se nenhum valor corresponder
     }    
-
 }

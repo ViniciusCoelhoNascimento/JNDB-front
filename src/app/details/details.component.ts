@@ -32,7 +32,7 @@ import { CommentsSessionComponent } from '../comments-session/comments-session.c
         </div>
 </div>
 
-<app-comments-session></app-comments-session>
+<app-comments-session [itemType]="'details-book'" [itemId]="itemId"></app-comments-session>
 
   </article>
   `,
@@ -40,6 +40,7 @@ import { CommentsSessionComponent } from '../comments-session/comments-session.c
 })
 export class DetailsComponent {
   route: ActivatedRoute = inject(ActivatedRoute)
+  itemId: number =  Number(this.route.snapshot.params['id'])
   videoList: Video[] = [];
   dbService: DbService = inject(DbService)
   imageSaveBook = 'assets/saveBook.png'
@@ -48,12 +49,11 @@ export class DetailsComponent {
   book?: Book;
 
   constructor(){
-    const itemId = Number(this.route.snapshot.params['id'])
-    this.dbService.getRelatedVideos(itemId).then((lVideoList: Video[]) => {
+    this.dbService.getRelatedVideos(this.itemId).then((lVideoList: Video[]) => {
       this.videoList = lVideoList;
     });
 
-    this.dbService.getBookById(itemId).then((lbook: Book) => {
+    this.dbService.getBookById(this.itemId).then((lbook: Book) => {
       this.book = lbook;
     });
   }
