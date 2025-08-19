@@ -1,6 +1,7 @@
 export interface Movie {
     id: number,
     title: string,
-    date: string,
+    year: string, 
+    plot?: string,
     linkPoster: string
 }
