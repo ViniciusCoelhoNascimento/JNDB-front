@@ -22,9 +22,9 @@ import { CommentsSessionComponent } from '../comments-session/comments-session.c
             <img title="Favoritar" alt="favoritar" (click)="favorite()" class="save-button" [src]="imageSaveMovie" [ngClass]="{'favorited': isFavorited}"/>
             <img title="Retirar dos favoritos" (click)="unfavorite()" class="save-button" [src]="imageSavedMovie" [ngClass]="{'favorited': !isFavorited}"/>
           </div>
-          <p class="author">{{Movie?.date}}</p>
+          <p class="author">{{Movie?.year}}</p>
           <p>Aparece em:</p>
-          <a [href]="'https://www.youtube.com/watch?v=' + item.link" *ngFor="let item of videoList">{{item.title}}</a>
+          <a [href]="'https://www.youtube.com/watch?v=' + item.link" *ngFor="let item of videoList">{{item.title}}<br></a>
         </div>
 
         <!-- Imagem do Livro -->

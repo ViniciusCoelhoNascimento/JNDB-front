@@ -3,6 +3,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, FormsModule } from '@angul
 import { CommonModule } from '@angular/common';
 import { DbService } from '../db.service';
 import { ToastrService } from 'ngx-toastr';
+import { Movie } from '../movie';
 
 @Component({
   selector: 'app-submit-movie',
@@ -20,18 +21,18 @@ import { ToastrService } from 'ngx-toastr';
               id="videoSelected"
               formControlName="videoSelected"
               autocomplete="off"
-              [(ngModel)]="query" 
-              (input)="onInputChange()" 
+              [(ngModel)]="queryVideo" 
+              (input)="onInputChangeVideos()" 
               type="text" 
               placeholder="Digite o nome do video..." 
               class="form-control" />
             
             <!-- Exibe sugestões apenas se houver sugestões -->
-            <ul *ngIf="suggestions.length > 0" class="list-group mt-2">
+            <ul *ngIf="VideosSuggestions.length > 0" class="list-group mt-2">
               <li 
-                *ngFor="let suggestion of suggestions" 
+                *ngFor="let suggestion of VideosSuggestions" 
                 class="list-group-item list-group-item-action" 
-                (click)="selectSuggestion(suggestion)">
+                (click)="selectVideoSuggestion(suggestion)">
                 {{ suggestion }}
               </li>
             </ul>
@@ -40,7 +41,27 @@ import { ToastrService } from 'ngx-toastr';
           <div>
             <label for="title">Titulo do filme:</label>
             <div style="display:flex; gap: 5px; align-items: center;">
-              <input for="title" type="text" formControlName="title"><button type="button" (click)="getMovieTMDbAPI()">Procurar</button>
+            <input 
+              id="title"
+              formControlName="title"
+              autocomplete="off"
+              [(ngModel)]="queryMovie" 
+              (input)="onInputChangeMovies()" 
+              type="text" 
+              placeholder="Digite o nome do filme..." 
+              class="form-control" />
+              
+            <!-- Exibe sugestões apenas se houver sugestões -->
+            <ul *ngIf="moviesSuggestions.length > 0" class="list-group mt-2">
+              <li 
+                *ngFor="let moviesSuggestions of moviesSuggestions" 
+                class="list-group-item list-group-item-action" 
+                (click)="selectMovieSuggestion(moviesSuggestions)">
+                {{ moviesSuggestions }}
+              </li>
+            </ul>
+
+              <button type="button" (click)="getMovieTMDbAPI()">Procurar</button>
               <img class="invisible" src="assets/loading.gif" height="16px" width="16px" [ngClass]="{'invisible': !loadingBln}">
             </div>
           </div>
@@ -69,17 +90,23 @@ export class SubmitMovieComponent {
       videoSelected: new FormControl(''),
     });
   
-    query = ''; // Valor do campo de entrada
-    suggestions: string[] = []; // Sugestões que serão exibidas
-    allSuggestions: string[] = [];
-    dicionario: Map<number, string> = new Map(); //o TypeScript exige que todas as propriedades de uma classe sejam inicializadas de alguma forma antes de serem usadas
+    queryVideo = ''; // Valor do campo de entrada
+    queryMovie = ''; // Valor do campo de entrada
+    VideosSuggestions: string[] = []; // Sugestões que serão exibidas
+    allVideosSuggestions: string[] = [];
+    allMoviesSuggestions: string[] = [];
+    moviesSuggestions: string[] = []; // Sugestões que serão exibidas
+    dicionarioVideos: Map<number, string> = new Map(); //o TypeScript exige que todas as propriedades de uma classe sejam inicializadas de alguma forma antes de serem usadas
+    dicionarioMovies: Map<string, Movie> = new Map(); //o TypeScript exige que todas as propriedades de uma classe sejam inicializadas de alguma forma antes de serem usadas
     title: string = '';
     plot: string = '';
     posterURL: string = '';
     year: string = '';
+    movieIdSelected: number = 0;
   
     constructor(private toastr: ToastrService){
      this.getNerdOfficeVideos();
+     this.getMoviesFromDB();
     }
   
     async submitMovie(){
@@ -89,7 +116,7 @@ export class SubmitMovieComponent {
       }
 
       //primeiro cadastra o filme e depois cadastra a relação
-      const videoId = this.getKeyByValue(this.dicionario, this.applyForm.value.videoSelected ?? '')
+      const videoId = this.getKeyByValue(this.dicionarioVideos, this.applyForm.value.videoSelected ?? '')
       const title = this.applyForm.value.title;
       const description = this.applyForm.value.description;
       const info = null;
@@ -103,8 +130,13 @@ export class SubmitMovieComponent {
 
       try{
         //cadastro filme
-        const filmeId = await this.dbService.makeAuthenticatedPOST('logged/movies/movies', movieBody)
-        console.log('filme id: ' + filmeId)
+        let filmeId: number = 0;
+        if (this.movieIdSelected == 0){
+          filmeId = await this.dbService.makeAuthenticatedPOST('logged/movies/movies', movieBody)
+        }else{
+          filmeId = this.movieIdSelected
+        }
+        
         //cadastro relação
         const relationBody = {
           filmeId: filmeId,
@@ -157,32 +189,69 @@ export class SubmitMovieComponent {
       }
     }
   
-    async onInputChange() {
+    async onInputChangeVideos() {
   
-      if (this.query) {
-        this.suggestions = this.allSuggestions.filter(item => {
-          const words = this.query.toLowerCase().split(/\s+/); // Divide a query em palavras
+      if (this.queryVideo) {
+        this.VideosSuggestions = this.allVideosSuggestions.filter(item => {
+          const words = this.queryVideo.toLowerCase().split(/\s+/); // Divide a query em palavras
           return words.every(word => item.toLowerCase().includes(word));
         });        
       } else {
-        this.suggestions = [];
+        this.VideosSuggestions = [];
       }
     }
+
+    async onInputChangeMovies() {
   
-    selectSuggestion(suggestion: string) {
-      this.query = suggestion; // Preenche o campo com a sugestão selecionada
-      this.suggestions = []; // Limpa as sugestões
+      if (this.queryMovie) {
+        this.moviesSuggestions = this.allMoviesSuggestions.filter(item => {
+          const words = this.queryMovie.toLowerCase().split(/\s+/); // Divide a query em palavras
+          return words.every(word => item.toLowerCase().includes(word));
+        });        
+      } else {
+        this.VideosSuggestions = [];
+      }
+    }
+
+    selectVideoSuggestion(suggestion: string) {
+      this.queryVideo = suggestion; // Preenche o campo com a sugestão selecionada
+      this.VideosSuggestions = []; // Limpa as sugestões
+    }
+  
+    selectMovieSuggestion(suggestion: string) {
+      this.queryMovie = suggestion; // Preenche o campo com a sugestão selecionada
+
+      this.moviesSuggestions = []; // Limpa as sugestões
+
+      const movie = this.dicionarioMovies.get(suggestion);
+      if(movie){
+        this.movieIdSelected = movie.id;
+
+        this.title = movie.title;
+        this.year = movie.year;
+        this.plot = movie.plot || '';
+        this.posterURL = movie.linkPoster;
+      }
     }
   
     async getNerdOfficeVideos(){
       const json = await this.dbService.getResponse('api/movies/videos');
       
       Object.values(json).forEach((item: any) => {
-        this.dicionario.set(item.id, item.title);
-        this.allSuggestions.push(item.title);
+        this.dicionarioVideos.set(item.id, item.title);
+        this.allVideosSuggestions.push(item.title);
+      });
+    }
+
+    async getMoviesFromDB(){
+      const json = await this.dbService.getResponse('api/movies/movies');
+      
+      Object.values(json).forEach((item: any) => {
+        this.dicionarioMovies.set(item.title, item);
+        this.allMoviesSuggestions.push(item.title);
       });
 
-      console.log(this.allSuggestions)
+      console.log('all movies: ', this.dicionarioMovies);
     }
   
     // Função para buscar a chave pelo valor

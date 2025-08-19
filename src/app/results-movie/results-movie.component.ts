@@ -15,7 +15,7 @@ import { RouterModule } from '@angular/router';
                <div class="card" style="display: flex; flex-direction: row;">
                    <div class="card-body">
                        <h5 class="card-title">{{movie.title}}</h5>
-                       <p class="card-text">{{movie.date}}</p>
+                       <p class="card-text">{{movie.year}}</p>
                        <a [routerLink]="['/details-movie', movie.id]">Ver mais</a>
                    </div>
                    <div>
